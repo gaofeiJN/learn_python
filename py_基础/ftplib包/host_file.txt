@@ -1,0 +1,7 @@
+total 50
+lrwxrwxrwx   1 OMVSKERN SYS1           9 Oct 22  2007 $SYSNAME -> $SYSNAME/
+lrwxrwxrwx   1 OMVSKERN SYS1           9 Oct 22  2007 $VERSION -> $VERSION/
+drwxr-xr-x   6 OMVSKERN SYS1        8192 Oct 22  2007 ADCD
+drwxr-xr-x  11 OMVSKERN SYS1         736 Oct 18  2007 Z19
+lrwxrwxrwx   1 OMVSKERN SYS1          12 Oct 22  2007 bin -> $VERSION/bin
+lrwxrwxrwx   1 OMVSKERN SYS1          12 Oct 22  2007 dev -> $SYSNAME/dev

@@ -1,0 +1,12 @@
+# 依赖管理文件
+# 标准库依赖
+# - ftplib (内置)
+# - argparse (内置)
+# - os (内置)
+# - sys (内置)
+# - configparser (内置)
+# - logging (内置)
+# - typing (内置)
+
+# 可选依赖
+tqdm==4.66.4  # 用于进度显示

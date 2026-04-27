@@ -1,0 +1,95 @@
+       IDENTIFICATION        DIVISION.
+       PROGRAM-ID.  BKINQ.
+       AUTHOR.  GAO FEI.
+       ENVIRONMENT           DIVISION.
+      *
+       CONFIGURATION         SECTION.
+       SOURCE-COMPUTER.  IBM-390.
+       OBJECT-COMPUTER.  IBM-390.
+      *
+       INPUT-OUTPUT          SECTION.
+       FILE-CONTROL.
+      *
+       DATA DIVISION.
+      *
+       FILE                  SECTION.
+      *
+       WORKING-STORAGE       SECTION.
+      *
+       01  FILLER  PIC  X(21) VALUE 'WORKING STORAGE BEGIN'.
+      *
+       01  WRK-CUSTIDC            PIC  X(18).
+      *
+       01  SWITCHES.
+           03  END-OF-INQUIRY-SW  PIC  X VALUE 'N'.
+               88  END-OF-INQUIRY        VALUE 'Y'.
+           03  CUSTINFO-FOUND-SW  PIC  X.
+               88  CUSTINFO-FOUND        VALUE 'Y'.
+      *
+           EXEC SQL INCLUDE SQLCA     END-EXEC.
+           EXEC SQL INCLUDE CUSTINFO  END-EXEC.
+      *
+       PROCEDURE DIVISION.
+      *-----------------------------------------------------------------------
+       1000-DISPLAY-CUSTINFO-ROWS.
+      *
+           PERFORM  1100-DISPLAY-CUSTINFO-ROW
+             UNTIL  END-OF-INQUIRY.
+           STOP RUN.
+      *-----------------------------------------------------------------------
+       1100-DISPLAY-CUSTINFO-ROW.
+      *
+           PERFORM  1110-ACCEPT-CUSTINFO-ID.
+      *
+           IF  NOT END-OF-INQUIRY
+               SET CUSTINFO-FOUND       TO  TRUE
+               PERFORM  1120-GET-CUSTINFO-ROW
+               IF  CUSTINFO-FOUND
+                   PERFORM  1130-DISPLAY-CUSTINFO-LINES
+               ELSE
+                   PERFORM  1140-DISPLAY-ERROR-LINES
+               END-IF
+           END-IF.
+      *-----------------------------------------------------------------------
+       1110-ACCEPT-CUSTINFO-ID.
+           DISPLAY 'ACCEPT CUSTIDC FROM SYSIN --------------------'.
+           ACCEPT WRK-CUSTIDC.
+           MOVE   WRK-CUSTIDC           TO  CUSTIDC.
+           DISPLAY 'CUSTIDC IS ' CUSTIDC.
+      *
+           IF  CUSTIDC = '999999999999999999'
+               SET  END-OF-INQUIRY      TO  TRUE
+           END-IF.
+      *
+      *-----------------------------------------------------------------------
+       1120-GET-CUSTINFO-ROW.
+      *
+           EXEC SQL
+             SELECT   CUSTIDC,  CUSTNAME,  CUSTSEX,  CUSTADDR,  CUSTTEL,
+                      CUSTCITY,  ZIPCODE
+               INTO  :CUSTIDC, :CUSTNAME, :CUSTSEX, :CUSTADDR, :CUSTTEL,
+                     :CUSTCITY, :ZIPCODE
+               FROM  IBMUSER.CUSTINFO
+               WHERE CUSTIDC = :CUSTIDC
+           END-EXEC.
+      *
+           IF  SQLCODE NOT = ZERO
+               MOVE  'N'                TO  CUSTINFO-FOUND-SW
+               DISPLAY ' SQLCODE = ' SQLCODE
+           END-IF.
+      *-----------------------------------------------------------------------
+       1130-DISPLAY-CUSTINFO-LINES.
+           DISPLAY '-------------------------------------------------'.
+           DISPLAY '  CUSTINFO(' CUSTIDC '):'.
+           DISPLAY '  NAME    :' CUSTNAME ' SEX : ' CUSTSEX.
+           DISPLAY '  ADDRESS :' CUSTADDR.
+           DISPLAY '  TEL.    :' CUSTTEL.
+           DISPLAY '  CITY    :' CUSTCITY.
+           DISPLAY '  ZIPCODE :' ZIPCODE.
+           DISPLAY '-------------------------------------------------'.
+      *-----------------------------------------------------------------------
+       1140-DISPLAY-ERROR-LINES.
+           DISPLAY '-------------------------------------------------'.
+           DISPLAY '  CUSTINFO  ID ' CUSTIDC '  NOT FOUND'.
+           DISPLAY '-------------------------------------------------'.
+      *-----------------------------------------------------------------------
